@@ -1,0 +1,12 @@
+# 忽略虛擬環境
+myenv01/
+
+# 忽略 Python 暫存檔
+__pycache__/
+*.pyc
+
+# 忽略你剛裝上的「眼睛」日誌檔
+debug.log
+
+# 忽略資料庫（如果是練習用的話）
+db.sqlite3
