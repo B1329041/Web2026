@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>景點觀光展覽資訊 - HW4</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+
+        body { background-color: #f8f9fa; padding-top: 20px; }
+
+        .header-bg { background-color: #28a745; color: white; }
+
+        .pagination-info { margin: 10px 0; font-weight: bold; }
+
+        #csie th { background-color: #28a745; color: white; }
+</style>
+</head>
+<body class="container">
+<div class="d-flex align-items-center mb-3">
+<h1 class="me-3">景點觀光展覽資訊</h1>
+<input type="text" id="searchInput" class="form-control w-25" placeholder="搜尋名稱..." onchange="handleSearch()">
+</div>
+<table id="csie" class="table table-striped table-hover">
+<thead>
+<tr>
+<th>名稱</th>
+<th>地點</th>
+<th>票價</th>
+</tr>
+</thead>
+<tbody id="tableBody">
+</tbody>
+</table>
+<div class="d-flex align-items-center gap-2">
+<button class="btn btn-outline-secondary btn-sm" onclick="prevPage()">上一頁</button>
+<span class="pagination-info" id="pageLabel">1 / 1 頁</span>
+<button class="btn btn-outline-secondary btn-sm" onclick="nextPage()">下一頁</button>
+</div>
+<script>
+
+        let allData = [];
+
+        let filteredData = [];
+
+        let currentPage = 1;
+
+        const rowsPerPage = 10;
+
+
+        const openUrl = "https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=6";
+
+        fetch(openUrl)
+
+            .then(res => res.json())
+
+            .then(data => {
+
+                allData = data;
+
+                filteredData = data;
+
+                renderTable();
+
+            });
+
+
+        function renderTable() {
+
+            const tbody = document.getElementById('tableBody');
+
+            tbody.innerHTML = "";
+
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * rowsPerPage;
+
+            const end = start + rowsPerPage;
+
+            const pageData = filteredData.slice(start, end);
+
+            pageData.forEach(item => {
+
+                const row = tbody.insertRow();
+
+                row.insertCell(0).innerText = item.title;
+
+                row.insertCell(1).innerText = item.showInfo[0]?.location || "無資訊";
+
+                row.insertCell(2).innerText = item.showInfo[0]?.price || "無資訊";
+
+            });
+
+
+            document.getElementById('pageLabel').innerText = `${currentPage} / ${totalPages} 頁`;
+
+        }
+
+
+        function handleSearch() {
+
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            filteredData = allData.filter(item => item.title.toLowerCase().includes(keyword));
+
+            currentPage = 1;
+
+            renderTable();
+
+        }
+
+        function prevPage() {
+
+            if (currentPage > 1) {
+
+                currentPage--;
+
+                renderTable();
+
+            }
+
+        }
+
+        function nextPage() {
+
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+            if (currentPage < totalPages) {
+
+                currentPage++;
+
+                renderTable();
+
+            }
+
+        }
+</script>
+</body>
+</html>
